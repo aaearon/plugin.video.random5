@@ -72,11 +72,9 @@ def getRandomEpisodes(number, show):
 
     # Check to make sure we still have an episode pool to pull from
     if len(all_episodes) < 1:
-        # TODO: Need to throw up a dialog about there being no eligible episodes
         line1 = 'There are no episodes to create a playlist from!'
         line2 = '\nEither the TV show has no episodes or if unwatched only is selected, all episodes have been watched.'
         xbmcgui.Dialog().ok(__addonname__, line1, line2)
-        pass
 
     if number <= len(all_episodes):
         while len(episodes) < number:
