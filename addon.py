@@ -66,16 +66,19 @@ def getRandomEpisodes(number, show):
         log('Unwatched episodes only', level=xbmc.LOGDEBUG)
         for episode in all_episodes:
             if episode['playcount'] == 0:
-                new_episode_list.add(episode)
+                new_episode_list.append(episode)
         all_episodes = new_episode_list
         log('%s unwatched episodes to pull from' % len(all_episodes), level=xbmc.LOGDEBUG)
 
     # Check to make sure we still have an episode pool to pull from
     if len(all_episodes) < 1:
         # TODO: Need to throw up a dialog about there being no eligible episodes
+        line1 = 'There are no episodes to create a playlist from!'
+        line2 = '\nEither the TV show has no episodes or if unwatched only is selected, all episodes have been watched.'
+        xbmcgui.Dialog().ok(__addonname__, line1, line2)
         pass
 
-    if (number <= len(all_episodes)):
+    if number <= len(all_episodes):
         while len(episodes) < number:
             episode = random.choice(all_episodes)
             # Make sure episode is not already in the list
@@ -84,7 +87,7 @@ def getRandomEpisodes(number, show):
                 log('Randomly chose %s with playcount %s' % (episode['label'], episode['playcount']), level=xbmc.LOGDEBUG)
 
     # If there are not enough episodes to meet the desired number of playlist items, add what episodes there are
-    elif (number > len(all_episodes)):
+    elif number > len(all_episodes):
         while len(episodes) < len(all_episodes):
             episode = random.choice(all_episodes)
             if episode not in episodes:
