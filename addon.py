@@ -13,7 +13,7 @@ __addonname__ = __addon__.getAddonInfo('name')
 
 # Get settings
 number = __addon__.getSetting('numberOfEpisodes')
-unwatched_only = __addon__.getSetting('unwatchedOnly')
+watched_only = __addon__.getSetting('watchedOnly')
 
 addon_handle = int(sys.argv[1])
 args = urlparse.parse_qs(sys.argv[2][1:])
@@ -61,19 +61,19 @@ def getRandomEpisodes(number, show):
     episodes = []
     all_episodes = getEpisodes(show)
 
-    if unwatched_only:
+    if watched_only:
         new_episode_list = []
-        log('Unwatched episodes only', level=xbmc.LOGDEBUG)
+        log('Watched episodes only', level=xbmc.LOGDEBUG)
         for episode in all_episodes:
-            if episode['playcount'] == 0:
+            if episode['playcount'] >= 1:
                 new_episode_list.append(episode)
         all_episodes = new_episode_list
-        log('%s unwatched episodes to pull from' % len(all_episodes), level=xbmc.LOGDEBUG)
+        log('%s watched episodes to pull from' % len(all_episodes), level=xbmc.LOGDEBUG)
 
     # Check to make sure we still have an episode pool to pull from
     if len(all_episodes) < 1:
         line1 = 'There are no episodes to create a playlist from!'
-        line2 = '\nEither the TV show has no episodes or if unwatched only is selected, all episodes have been watched.'
+        line2 = '\nEither the TV show has no episodes or if watched only is selected, all episodes are unwatched.'
         xbmcgui.Dialog().ok(__addonname__, line1, line2)
 
     if number <= len(all_episodes):
