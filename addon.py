@@ -46,13 +46,14 @@ def getEpisodes(show):
     for e in request['result']['episodes']:
         episodes.append(e)
 
-    log('Returning %s episodes' % len(episodes), level=xbmc.LOGDEBUG)
+    log('Returning %s episodes to start with' % len(episodes), level=xbmc.LOGDEBUG)
     return episodes
 
 def addItemToPlaylist(episode):
     """Adds a video file to the video playlist"""
     request = x.Playlist.Add({"item": {"file": episode['file']}, "playlistid": 1})
     log('Adding %s to playlist' % episode['label'], level=xbmc.LOGDEBUG)
+
 
 def getRandomEpisodes(number, show):
     """Randomly selects a number of episodes from a particular show"""
@@ -61,10 +62,13 @@ def getRandomEpisodes(number, show):
     all_episodes = getEpisodes(show)
 
     if unwatched_only:
+        new_episode_list = []
         log('Unwatched episodes only', level=xbmc.LOGDEBUG)
         for episode in all_episodes:
-            if episode['playcount'] >= 1:
-                all_episodes.remove(episode)
+            if episode['playcount'] == 0:
+                new_episode_list.add(episode)
+        all_episodes = new_episode_list
+        log('%s unwatched episodes to pull from' % len(all_episodes), level=xbmc.LOGDEBUG)
 
     # Check to make sure we still have an episode pool to pull from
     if len(all_episodes) < 1:
@@ -74,9 +78,10 @@ def getRandomEpisodes(number, show):
     if (number <= len(all_episodes)):
         while len(episodes) < number:
             episode = random.choice(all_episodes)
+            # Make sure episode is not already in the list
             if episode not in episodes:
                 episodes.append(episode)
-                log('Randomly chose %s' % episode['label'], level=xbmc.LOGDEBUG)
+                log('Randomly chose %s with playcount %s' % (episode['label'], episode['playcount']), level=xbmc.LOGDEBUG)
 
     # If there are not enough episodes to meet the desired number of playlist items, add what episodes there are
     elif (number > len(all_episodes)):
@@ -84,7 +89,7 @@ def getRandomEpisodes(number, show):
             episode = random.choice(all_episodes)
             if episode not in episodes:
                 episodes.append(episode)
-                log('Randomly chose %s' % episode['label'], level=xbmc.LOGDEBUG)
+                log('Randomly chose %s with playcount %s' % (episode['label'], episode['playcount']), level=xbmc.LOGDEBUG)
 
     return episodes
 
