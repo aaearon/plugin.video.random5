@@ -11,13 +11,14 @@ from resources.lib.xbmcjson import XBMC as xbmcjson
 __addon__ = xbmcaddon.Addon(id='plugin.video.random5')
 __addonname__ = __addon__.getAddonInfo('name')
 
-
+# Get settings
+number = __addon__.getSetting('numberOfEpisodes')
 args = urlparse.parse_qs(sys.argv[2][1:])
+
 addon_handle = int(sys.argv[1])
+path = args.get('path', None)
 
 x = xbmcjson("http://localhost/jsonrpc")
-
-path = args.get('path', None)
 
 def log(message, level):
     xbmc.log('[' + __addonname__ + '] ' + message, level)
@@ -50,14 +51,20 @@ def addItemToPlaylist(episode):
     log('Adding %s to playlist' % episode['label'], level=xbmc.LOGDEBUG)
 
 def getRandomEpisodes(number, show):
+    number = int(number)
     episodes = []
     all_episodes = getEpisodes(show)
 
-    #HARDCODED: returns 5 regardless of what number is, eventually this will be configurable value
-    for i in range(5):
-        episode = random.choice(all_episodes)
-        episodes.append(episode)
-        log('Randomly chose %s' % episode['label'], level=xbmc.LOGDEBUG)
+    if (number <= len(all_episodes)):
+        for i in range(number):
+            episode = random.choice(all_episodes)
+            episodes.append(episode)
+            log('Randomly chose %s' % episode['label'], level=xbmc.LOGDEBUG)
+    elif (number > len(all_episodes)):
+        for i in range(len(all_episodes)):
+            episode = random.choice(all_episodes)
+            episodes.append(episode)
+            log('Randomly chose %s' % episode['label'], level=xbmc.LOGDEBUG)
 
     return episodes
 
@@ -71,9 +78,9 @@ def createPlaylist(shows):
     log('Playlist created', level=xbmc.LOGDEBUG)
 
 def createAndPlay(show):
-    episodes = getRandomEpisodes(5, show)
+    episodes = getRandomEpisodes(number, show)
     createPlaylist(episodes)
-    x.Player.Open({"item": {"playlistid": 1}})
+    #x.Player.Open({"item": {"playlistid": 1}})
 
 def createMenu(shows):
     #Create 'entire library' list item
