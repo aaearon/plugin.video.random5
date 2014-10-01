@@ -55,16 +55,20 @@ def getRandomEpisodes(number, show):
     episodes = []
     all_episodes = getEpisodes(show)
 
+
     if (number <= len(all_episodes)):
-        for i in range(number):
+        while len(episodes) < number:
             episode = random.choice(all_episodes)
-            episodes.append(episode)
-            log('Randomly chose %s' % episode['label'], level=xbmc.LOGDEBUG)
+            if episode not in episodes:
+                episodes.append(episode)
+                log('Randomly chose %s' % episode['label'], level=xbmc.LOGDEBUG)
+
     elif (number > len(all_episodes)):
-        for i in range(len(all_episodes)):
+        while len(episodes) < len(all_episodes):
             episode = random.choice(all_episodes)
-            episodes.append(episode)
-            log('Randomly chose %s' % episode['label'], level=xbmc.LOGDEBUG)
+            if episode not in episodes:
+                episodes.append(episode)
+                log('Randomly chose %s' % episode['label'], level=xbmc.LOGDEBUG)
 
     return episodes
 
