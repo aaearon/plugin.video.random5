@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<settings>
+        <setting label="30000" type="slider" id="numberOfEpisodes" default="5" range="2,20" option="int" />
+        <setting label="30001" type="bool" id="unwatchedOnly" default="true" />
+</settings>
