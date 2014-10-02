@@ -153,6 +153,3 @@ if path is None:
 elif path[0] == '/play':
     showid = args.get('show', None)
     createAndPlay(showid[0])
-
-print getEpisodesByShow(1)
-print getShows()
