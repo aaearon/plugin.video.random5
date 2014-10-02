@@ -18,6 +18,7 @@ number = int(__addon__.getSetting('numberOfEpisodes'))
 watched_only = __addon__.getSetting('watchedOnly')
 fill_with_unwatched =__addon__.getSetting('fillWithUnwatched')
 
+
 args = urlparse.parse_qs(sys.argv[2][1:])
 path = args.get('path', None)
 
@@ -28,25 +29,18 @@ def log(message, level):
 
 def getShows():
     """Returns all shows in the library"""
-    shows = []
-
     request = x.VideoLibrary.GetTVShows()
-
-    for s in request['result']['tvshows']:
-        shows.append(s)
+    shows = request['result']['tvshows']
 
     log('Returning %s shows' % len(shows), level=xbmc.LOGDEBUG)
     return shows
 
-def getEpisodes(show):
+def getEpisodesByShow(show):
     """Gets all episodes for given show"""
     show = int(show) # Needs to be an integer
-    episodes = []
 
     request = x.VideoLibrary.GetEpisodes({'tvshowid': show, 'properties': ['title', 'file', 'playcount']})
-
-    for e in request['result']['episodes']:
-        episodes.append(e)
+    episodes = request['result']['episodes']
 
     log('Returning %s episodes to start with' % len(episodes), level=xbmc.LOGDEBUG)
     return episodes
@@ -65,10 +59,20 @@ def getWatchedEpisodes(episodes):
     log('Returning %s watched episodes ' % len(watched_episodes), level=xbmc.LOGDEBUG)
     return watched_episodes
 
+def getEpisodes():
+    """Returns all episodes"""
+    request = x.VideoLibrary.GetEpisodes({'properties': ['title', 'tvshowid', 'file', 'playcount']})
+    return request['result']['episodes']
+
+def getEpisode(episodeid):
+    """Returns episode with specified episodeid"""
+    request = x.VideoLibrary.GetEpisodeDetails({'episodeid': episodeid, 'properties': ['tvshowid', 'file', 'playcount']})
+    return request['result']['episodedetails']
+
 def getRandomEpisodes(number, show):
     """Randomly selects a number of episodes from a particular show"""
     episodes = []
-    all_episodes = getEpisodes(show)
+    all_episodes = getEpisodesByShow(show)
 
     if watched_only == 'true':
         log('Watched episodes only', level=xbmc.LOGDEBUG)
@@ -100,7 +104,7 @@ def getRandomEpisodes(number, show):
     # TODO: This can be done better, a lot of duplicate code
     if watched_only == 'true' and fill_with_unwatched == 'true' and len(episodes) != number:
         log('Filling with unwatched episodes. Current number of playlist items is %s while desired is %s' % (len(episodes), number), level=xbmc.LOGDEBUG)
-        all_episodes = getEpisodes(show)
+        all_episodes = getEpisodesByShow(show)
         while len(episodes) < number:
             episode = random.choice(all_episodes)
             if episode not in episodes:
@@ -149,3 +153,6 @@ if path is None:
 elif path[0] == '/play':
     showid = args.get('show', None)
     createAndPlay(showid[0])
+
+print getEpisodesByShow(1)
+print getShows()
