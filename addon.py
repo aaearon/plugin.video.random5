@@ -8,14 +8,16 @@ import xbmcaddon
 
 from resources.lib.xbmcjson import XBMC as xbmcjson
 
+addon_handle = int(sys.argv[1])
+
 __addon__ = xbmcaddon.Addon(id='plugin.video.random5')
 __addonname__ = __addon__.getAddonInfo('name')
 
 # Get settings
-number = __addon__.getSetting('numberOfEpisodes')
+number = int(__addon__.getSetting('numberOfEpisodes'))
 watched_only = __addon__.getSetting('watchedOnly')
+fill_with_unwatched =__addon__.getSetting('fillWithUnwatched')
 
-addon_handle = int(sys.argv[1])
 args = urlparse.parse_qs(sys.argv[2][1:])
 path = args.get('path', None)
 
@@ -54,21 +56,23 @@ def addItemToPlaylist(episode):
     request = x.Playlist.Add({"item": {"file": episode['file']}, "playlistid": 1})
     log('Adding %s to playlist' % episode['label'], level=xbmc.LOGDEBUG)
 
+def getWatchedEpisodes(episodes):
+    watched_episodes = []
+    for episode in episodes:
+        if episode['playcount'] > 0:
+            watched_episodes.append(episode)
+
+    log('Returning %s watched episodes ' % len(watched_episodes), level=xbmc.LOGDEBUG)
+    return watched_episodes
 
 def getRandomEpisodes(number, show):
     """Randomly selects a number of episodes from a particular show"""
-    number = int(number)
     episodes = []
     all_episodes = getEpisodes(show)
 
-    if watched_only:
-        new_episode_list = []
+    if watched_only == 'true':
         log('Watched episodes only', level=xbmc.LOGDEBUG)
-        for episode in all_episodes:
-            if episode['playcount'] >= 1:
-                new_episode_list.append(episode)
-        all_episodes = new_episode_list
-        log('%s watched episodes to pull from' % len(all_episodes), level=xbmc.LOGDEBUG)
+        all_episodes = getWatchedEpisodes(all_episodes)
 
     # Check to make sure we still have an episode pool to pull from
     if len(all_episodes) < 1:
@@ -76,13 +80,14 @@ def getRandomEpisodes(number, show):
         line2 = '\nEither the TV show has no episodes or if watched only is selected, all episodes are unwatched.'
         xbmcgui.Dialog().ok(__addonname__, line1, line2)
 
+    # TODO: Clean this up as there is a lot of duplicate code
     if number <= len(all_episodes):
         while len(episodes) < number:
             episode = random.choice(all_episodes)
             # Make sure episode is not already in the list
             if episode not in episodes:
                 episodes.append(episode)
-                log('Randomly chose %s with playcount %s' % (episode['label'], episode['playcount']), level=xbmc.LOGDEBUG)
+                log('Adding episode %s with playcount %s' % (episode['label'], episode['playcount']), level=xbmc.LOGDEBUG)
 
     # If there are not enough episodes to meet the desired number of playlist items, add what episodes there are
     elif number > len(all_episodes):
@@ -92,10 +97,21 @@ def getRandomEpisodes(number, show):
                 episodes.append(episode)
                 log('Randomly chose %s with playcount %s' % (episode['label'], episode['playcount']), level=xbmc.LOGDEBUG)
 
+    # TODO: This can be done better, a lot of duplicate code
+    if watched_only == 'true' and fill_with_unwatched == 'true' and len(episodes) != number:
+        log('Filling with unwatched episodes. Current number of playlist items is %s while desired is %s' % (len(episodes), number), level=xbmc.LOGDEBUG)
+        all_episodes = getEpisodes(show)
+        while len(episodes) < number:
+            episode = random.choice(all_episodes)
+            if episode not in episodes:
+                episodes.append(episode)
+                log('Randomly chose %s with playcount %s' % (episode['label'], episode['playcount']), level=xbmc.LOGDEBUG)
+
     return episodes
 
 def createPlaylist(shows):
     """Creates a playlist of episodes of a particular show"""
+
     # Clear the playlist before we add items to it
     request = x.Playlist.Clear({"playlistid": 1})
 
@@ -107,8 +123,10 @@ def createPlaylist(shows):
 def createAndPlay(show):
     """Creates playlist and plays playlist"""
     episodes = getRandomEpisodes(number, show)
+
     createPlaylist(episodes)
     x.Player.Open({"item": {"playlistid": 1}})
+    # x.GUI.ActivateWindow({'window': 'videoplaylist'})
 
 def createMenu(shows):
     """Creates the 'folder' menu"""
