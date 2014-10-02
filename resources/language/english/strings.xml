@@ -2,4 +2,5 @@
 <strings>
     <string id="30000">Number of playlist items</string>
     <string id="30001">Watched episodes only</string>
+    <string id="30002">Fill playlist with unwatched episodes if not enough watched episodes?</string>
 </strings>

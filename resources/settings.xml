@@ -2,4 +2,5 @@
 <settings>
         <setting label="30000" type="slider" id="numberOfEpisodes" default="5" range="2,20" option="int" />
         <setting label="30001" type="bool" id="watchedOnly" default="true" />
+        <setting label="30002" type="bool" id="fillWithUnwatched" default="false" enable="eq(-1,true)" />
 </settings>
