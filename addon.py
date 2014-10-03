@@ -27,7 +27,7 @@ x = xbmcjson("http://localhost/jsonrpc")
 def log(message, level):
     xbmc.log('[' + __addonname__ + '] ' + message, level)
 
-def getShows():
+def get_shows():
     """Returns all shows in the library"""
     request = x.VideoLibrary.GetTVShows()
     shows = request['result']['tvshows']
@@ -35,7 +35,7 @@ def getShows():
     log('Returning %s shows' % len(shows), level=xbmc.LOGDEBUG)
     return shows
 
-def getEpisodesByShow(show):
+def get_episodes_by_show(show):
     """Gets all episodes for given show"""
     show = int(show) # Needs to be an integer
 
@@ -45,12 +45,12 @@ def getEpisodesByShow(show):
     log('Returning %s episodes to start with' % len(episodes), level=xbmc.LOGDEBUG)
     return episodes
 
-def addItemToPlaylist(episode):
+def add_item_to_playlist(episode):
     """Adds a video file to the video playlist"""
     request = x.Playlist.Add({"item": {"file": episode['file']}, "playlistid": 1})
     log('Adding %s to playlist' % episode['label'], level=xbmc.LOGDEBUG)
 
-def getWatchedEpisodes(episodes):
+def get_watched_episodes(episodes):
     watched_episodes = []
     for episode in episodes:
         if episode['playcount'] > 0:
@@ -59,24 +59,24 @@ def getWatchedEpisodes(episodes):
     log('Returning %s watched episodes ' % len(watched_episodes), level=xbmc.LOGDEBUG)
     return watched_episodes
 
-def getEpisodes():
+def get_episodes():
     """Returns all episodes"""
     request = x.VideoLibrary.GetEpisodes({'properties': ['title', 'tvshowid', 'file', 'playcount']})
     return request['result']['episodes']
 
-def getEpisode(episodeid):
+def get_episode(episode_id):
     """Returns episode with specified episodeid"""
-    request = x.VideoLibrary.GetEpisodeDetails({'episodeid': episodeid, 'properties': ['tvshowid', 'file', 'playcount']})
+    request = x.VideoLibrary.GetEpisodeDetails({'episodeid': episode_id, 'properties': ['tvshowid', 'file', 'playcount']})
     return request['result']['episodedetails']
 
-def getRandomEpisodes(number, show):
+def get_random_episodes(number, show):
     """Randomly selects a number of episodes from a particular show"""
     episodes = []
-    all_episodes = getEpisodesByShow(show)
+    all_episodes = get_episodes_by_show(show)
 
     if watched_only == 'true':
         log('Watched episodes only', level=xbmc.LOGDEBUG)
-        all_episodes = getWatchedEpisodes(all_episodes)
+        all_episodes = get_watched_episodes(all_episodes)
 
     # Check to make sure we still have an episode pool to pull from
     if len(all_episodes) < 1:
@@ -104,7 +104,7 @@ def getRandomEpisodes(number, show):
     # TODO: This can be done better, a lot of duplicate code
     if watched_only == 'true' and fill_with_unwatched == 'true' and len(episodes) != number:
         log('Filling with unwatched episodes. Current number of playlist items is %s while desired is %s' % (len(episodes), number), level=xbmc.LOGDEBUG)
-        all_episodes = getEpisodesByShow(show)
+        all_episodes = get_episodes_by_show(show)
         while len(episodes) < number:
             episode = random.choice(all_episodes)
             if episode not in episodes:
@@ -113,26 +113,26 @@ def getRandomEpisodes(number, show):
 
     return episodes
 
-def createPlaylist(shows):
+def create_playlist(shows):
     """Creates a playlist of episodes of a particular show"""
 
     # Clear the playlist before we add items to it
     request = x.Playlist.Clear({"playlistid": 1})
 
     for s in shows:
-        addItemToPlaylist(s)
+        add_item_to_playlist(s)
 
     log('Playlist created', level=xbmc.LOGDEBUG)
 
-def createAndPlay(show):
+def create_and_play(show):
     """Creates playlist and plays playlist"""
-    episodes = getRandomEpisodes(number, show)
+    episodes = get_random_episodes(number, show)
 
-    createPlaylist(episodes)
+    create_playlist(episodes)
     x.Player.Open({"item": {"playlistid": 1}})
     # x.GUI.ActivateWindow({'window': 'videoplaylist'})
 
-def createMenu(shows):
+def create_menu(shows):
     """Creates the 'folder' menu"""
 
     # TODO: Create 'entire library' list item
@@ -148,8 +148,8 @@ def createMenu(shows):
 
 # The 'navigation' part
 if path is None:
-    createMenu(getShows())
+    create_menu(get_shows())
 
 elif path[0] == '/play':
     showid = args.get('show', None)
-    createAndPlay(showid[0])
+    create_and_play(showid[0])
