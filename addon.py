@@ -129,8 +129,8 @@ def create_and_play(show):
     episodes = get_random_episodes(number, show)
 
     create_playlist(episodes)
-    x.Player.Open({"item": {"playlistid": 1}})
-    # x.GUI.ActivateWindow({'window': 'videoplaylist'})
+    #x.Player.Open({"item": {"playlistid": 1}})
+    x.GUI.ActivateWindow({'window': 'videoplaylist'})
 
 def create_menu(shows):
     """Creates the 'folder' menu"""
