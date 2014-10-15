@@ -8,9 +8,6 @@ import xbmcaddon
 import json
 from StringIO import StringIO
 
-
-# from resources.lib.xbmcjson import XBMC as xbmcjson
-
 addon_handle = int(sys.argv[1])
 
 __addon__ = xbmcaddon.Addon(id='plugin.video.random5')
@@ -30,9 +27,10 @@ def log(message, level):
     xbmc.log('[' + __addonname__ + '] ' + message, level)
 
 def execute_json(method, *args, **kwargs):
+
     if len(args) == 1:
       args=args[0]
-    # Use kwargs for param=value style
+
     else:
       args = kwargs
 
