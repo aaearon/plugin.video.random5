@@ -49,6 +49,7 @@ class XBMCJsonTransport(XBMCTransport):
     req = urllib2.Request(self.url, data, header)
     response = urllib2.urlopen(req)
     the_page = response.read()
+    print the_page
     if len(the_page) > 0 :
       return json.load(StringIO(the_page))
     else:
