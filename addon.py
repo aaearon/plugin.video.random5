@@ -23,14 +23,16 @@ random_show_list_item = __addon__.getSetting('random_show_list_item')
 args = urlparse.parse_qs(sys.argv[2][1:])
 path = args.get('path', None)
 
-def log(message, level):
-    xbmc.log('[' + __addonname__ + '] ' + message, level)
+def log(text, level):
+    if isinstance(text, str):
+        text = text.decode('utf-8')
+
+    message = u'%s: %s' % (__addonname__, text)
+    xbmc.log(msg=message.encode('utf-8'), level=level)
 
 def execute_json(method, *args, **kwargs):
-
     if len(args) == 1:
       args=args[0]
-
     else:
       args = kwargs
 
@@ -168,14 +170,15 @@ def create_and_play(show):
     else:
         episodes = get_random_episodes(number, show)
 
-    create_playlist(episodes)
+    if len(episodes) > 0:
+        create_playlist(episodes)
 
-    if autoplay == 'true':
-        execute_json('Player.Open', {"item": {"playlistid": 1}})
-        log('Playing playlist', level=xbmc.LOGDEBUG)
-    else:
-        execute_json('GUI.ActivateWindow', {'window': 'videoplaylist'})
-        log('Showing playlist', level=xbmc.LOGDEBUG)
+        if autoplay == 'true':
+            execute_json('Player.Open', {"item": {"playlistid": xbmc.PLAYLIST_VIDEO}})
+            log('Playing playlist', level=xbmc.LOGDEBUG)
+        else:
+            execute_json('GUI.ActivateWindow', {'window': 'videoplaylist'})
+            log('Showing playlist', level=xbmc.LOGDEBUG)
 
 def create_menu(show_list):
     """Creates the 'folder' menu"""
