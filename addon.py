@@ -20,7 +20,6 @@ sequential_order = __addon__.getSetting('sequential_order')
 autoplay = __addon__.getSetting('autoplay')
 random_show_list_item = __addon__.getSetting('random_show_list_item')
 
-
 args = urlparse.parse_qs(sys.argv[2][1:])
 path = args.get('path', None)
 
