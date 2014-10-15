@@ -14,9 +14,9 @@ __addon__ = xbmcaddon.Addon(id='plugin.video.random5')
 __addonname__ = __addon__.getAddonInfo('name')
 
 # Get settings
-number = int(__addon__.getSetting('numberOfEpisodes'))
-watched_only = __addon__.getSetting('watchedOnly')
-fill_with_unwatched =__addon__.getSetting('fillWithUnwatched')
+number = int(__addon__.getSetting('number_of_episodes'))
+watched_only = __addon__.getSetting('watched_only')
+sequential_order = __addon__.getSetting('sequential_order')
 
 
 args = urlparse.parse_qs(sys.argv[2][1:])
@@ -42,41 +42,90 @@ def get_episodes_by_show(show):
     request = x.VideoLibrary.GetEpisodes({'tvshowid': show, 'properties': ['title', 'file', 'playcount']})
     episodes = request['result']['episodes']
 
+    if watched_only == 'true':
+        episodes = get_watched_episodes(episodes)
+
     log('Returning %s episodes to start with' % len(episodes), level=xbmc.LOGDEBUG)
     return episodes
 
-def add_item_to_playlist(episode):
+def add_episode_to_playlist(episode):
     """Adds a video file to the video playlist"""
     request = x.Playlist.Add({"item": {"file": episode['file']}, "playlistid": 1})
     log('Adding %s to playlist' % episode['label'], level=xbmc.LOGDEBUG)
 
-def get_watched_episodes(episodes):
+def get_watched_episodes(list_of_episodes):
+    """"Takes a list of episodes and returns only episodes that have a playcount of > 0"""
     watched_episodes = []
-    for episode in episodes:
+    for episode in list_of_episodes:
         if episode['playcount'] > 0:
             watched_episodes.append(episode)
 
-    log('Returning %s watched episodes ' % len(watched_episodes), level=xbmc.LOGDEBUG)
+    #log('Returning %s watched episodes ' % len(watched_episodes), level=xbmc.LOGDEBUG)
     return watched_episodes
 
 def get_episodes():
     """Returns all episodes"""
     request = x.VideoLibrary.GetEpisodes({'properties': ['title', 'tvshowid', 'file', 'playcount']})
-    return request['result']['episodes']
+    episodes = request['result']['episodes']
+
+    if watched_only == 'true':
+        episodes = get_watched_episodes(episodes)
+
+    return episodes
 
 def get_episode(episode_id):
     """Returns episode with specified episodeid"""
     request = x.VideoLibrary.GetEpisodeDetails({'episodeid': episode_id, 'properties': ['tvshowid', 'file', 'playcount']})
     return request['result']['episodedetails']
 
+def get_random_episode_by_show(show):
+    """Randomly selects an episode from the specified show"""
+    episodes = get_episodes_by_show(show)
+    return random.choice(episodes)
+
+def get_sequential_episodes(number, show):
+    episodes = []
+    show_episodes = get_episodes_by_show(show)
+
+    # Get a random episode from the show and add it to the list
+    first_episode = random.choice(show_episodes)
+    episodes.append(first_episode)
+
+    # Next episode is the index of the first episode + 1
+    next_episode = show_episodes.index(first_episode) + 1
+
+    while len(episodes) < number:
+        try:
+            episode = show_episodes[next_episode]
+            episodes.append(episode)
+            next_episode += 1
+        except IndexError:
+            break
+
+    return episodes
+
+def get_random_episodes2(number, show):
+    episodes = []
+    show_episodes = get_episodes_by_show(show)
+
+    # Check to make sure we still have an episode pool to pull from
+    if len(show_episodes) < 1:
+        line1 = 'There are no episodes to create a playlist from!'
+        line2 = '\nEither the TV show has no episodes or if watched only is selected, all episodes are unwatched.'
+        xbmcgui.Dialog().ok(__addonname__, line1, line2)
+
+    while len(episodes) < number:
+        random_episode = random.choice(show_episodes)
+        if random_episode not in episodes:
+            episodes.append(random_episode)
+            log('Adding episode %s with playcount %s' % (random_episode['label'], random_episode['playcount']), level=xbmc.LOGDEBUG)
+
+    return episodes
+
 def get_random_episodes(number, show):
     """Randomly selects a number of episodes from a particular show"""
     episodes = []
     all_episodes = get_episodes_by_show(show)
-
-    if watched_only == 'true':
-        log('Watched episodes only', level=xbmc.LOGDEBUG)
-        all_episodes = get_watched_episodes(all_episodes)
 
     # Check to make sure we still have an episode pool to pull from
     if len(all_episodes) < 1:
@@ -101,16 +150,6 @@ def get_random_episodes(number, show):
                 episodes.append(episode)
                 log('Randomly chose %s with playcount %s' % (episode['label'], episode['playcount']), level=xbmc.LOGDEBUG)
 
-    # TODO: This can be done better, a lot of duplicate code
-    if watched_only == 'true' and fill_with_unwatched == 'true' and len(episodes) != number:
-        log('Filling with unwatched episodes. Current number of playlist items is %s while desired is %s' % (len(episodes), number), level=xbmc.LOGDEBUG)
-        all_episodes = get_episodes_by_show(show)
-        while len(episodes) < number:
-            episode = random.choice(all_episodes)
-            if episode not in episodes:
-                episodes.append(episode)
-                log('Randomly chose %s with playcount %s' % (episode['label'], episode['playcount']), level=xbmc.LOGDEBUG)
-
     return episodes
 
 def create_playlist(shows):
@@ -120,13 +159,13 @@ def create_playlist(shows):
     request = x.Playlist.Clear({"playlistid": 1})
 
     for s in shows:
-        add_item_to_playlist(s)
+        add_episode_to_playlist(s)
 
     log('Playlist created', level=xbmc.LOGDEBUG)
 
 def create_and_play(show):
     """Creates playlist and plays playlist"""
-    episodes = get_random_episodes(number, show)
+    episodes = get_random_episodes2(number, show)
 
     create_playlist(episodes)
     #x.Player.Open({"item": {"playlistid": 1}})
@@ -153,3 +192,6 @@ if path is None:
 elif path[0] == '/play':
     showid = args.get('show', None)
     create_and_play(showid[0])
+
+# print get_random_episodes2(50, 2)
+# print get_sequential_episodes(50, 2)

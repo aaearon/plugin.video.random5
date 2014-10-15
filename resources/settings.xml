@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <settings>
-        <setting label="30000" type="slider" id="numberOfEpisodes" default="5" range="2,20" option="int" />
-        <setting label="30001" type="bool" id="watchedOnly" default="true" />
-        <setting label="30002" type="bool" id="fillWithUnwatched" default="false" enable="eq(-1,true)" />
+        <setting label="30000" type="slider" id="number_of_episodes" default="5" range="2,20" option="int" />
+        <setting label="30001" type="bool" id="watched_only" default="true" />
+        <setting label="30002" type="bool" id="sequential_episodes" default="false" />
 </settings>
