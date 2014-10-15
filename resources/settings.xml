@@ -2,5 +2,6 @@
 <settings>
         <setting label="30000" type="slider" id="number_of_episodes" default="5" range="2,20" option="int" />
         <setting label="30001" type="bool" id="watched_only" default="true" />
-        <setting label="30002" type="bool" id="sequential_episodes" default="false" />
+        <setting label="30002" type="bool" id="sequential_order" default="false" />
+        <setting label="30003" type="bool" id="autoplay" default="false" />
 </settings>
