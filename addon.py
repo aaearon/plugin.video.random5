@@ -170,6 +170,7 @@ def create_and_play(show):
     else:
         episodes = get_random_episodes(number, show)
 
+    # Don't bother doing any of the below if there are no episodes
     if len(episodes) > 0:
         create_playlist(episodes)
 
