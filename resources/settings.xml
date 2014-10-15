@@ -4,4 +4,5 @@
         <setting label="30001" type="bool" id="watched_only" default="true" />
         <setting label="30002" type="bool" id="sequential_order" default="false" />
         <setting label="30003" type="bool" id="autoplay" default="false" />
+        <setting label="30004" type="bool" id="random_show_list_item" default="true" />
 </settings>

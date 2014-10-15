@@ -18,6 +18,8 @@ number = int(__addon__.getSetting('number_of_episodes'))
 watched_only = __addon__.getSetting('watched_only')
 sequential_order = __addon__.getSetting('sequential_order')
 autoplay = __addon__.getSetting('autoplay')
+random_show_list_item = __addon__.getSetting('random_show_list_item')
+
 
 args = urlparse.parse_qs(sys.argv[2][1:])
 path = args.get('path', None)
@@ -162,6 +164,13 @@ def create_menu(show_list):
     # TODO: Create 'entire library' list item
     # li = xbmcgui.ListItem('ALL TV SHOWS', iconImage='DefaultFolder.png')
     # xbmcplugin.addDirectoryItem(handle=addon_handle, url='show', listitem=li, isFolder=False)
+
+    # 'Random show' entry
+    if random_show_list_item == 'true':
+        random_show = random.choice(show_list)
+        url = sys.argv[0] + "?path=/play&show=%s" % (random_show['tvshowid'])
+        li = xbmcgui.ListItem('- RANDOM SHOW -', iconImage='DefaultFolder.png')
+        xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=False)
 
     for s in show_list:
         url = sys.argv[0] + "?path=/play&show=%s" % (s['tvshowid'])
