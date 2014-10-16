@@ -67,7 +67,10 @@ def get_episodes_by_show(show):
     """Gets all episodes for given show"""
     show = int(show)  # Needs to be an integer
 
-    request = execute_json('VideoLibrary.GetEpisodes', {'tvshowid': show, 'properties': ['title', 'file', 'playcount']})
+    # Streamdetails has to be requested in addition to runtime or runtime will just return 0.
+    # http://trac.xbmc.org/ticket/14524
+    request = execute_json('VideoLibrary.GetEpisodes',
+                           {'tvshowid': show, 'properties': ['title', 'file', 'playcount', 'runtime', 'streamdetails']})
     episodes = request['result']['episodes']
 
     if watched_only == 'true':
@@ -91,17 +94,6 @@ def get_watched_episodes(episode_list):
             watched_episodes.append(episode)
 
     return watched_episodes
-
-
-def get_episodes():
-    """Returns all episodes"""
-    request = execute_json('VideoLibrary.GetEpisodes', {'properties': ['title', 'tvshowid', 'file', 'playcount']})
-    episodes = request['result']['episodes']
-
-    if watched_only == 'true':
-        episodes = get_watched_episodes(episodes)
-
-    return episodes
 
 
 def get_sequential_episodes(number, show):
@@ -224,3 +216,5 @@ if path is None:
 elif path[0] == '/play':
     showid = args.get('show', None)
     create_and_play(showid[0])
+
+print get_episodes_by_show(2)
