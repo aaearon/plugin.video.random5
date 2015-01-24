@@ -5,4 +5,7 @@
     <string id="30002">Sequential order</string>
     <string id="30003">Automatically start playback</string>
     <string id="30004">Show 'Random show'</string>
+    <string id="30100">There are no episodes to create a playlist from!</string>
+    <string id="30101">\nEither the TV show has no episodes or if watched only is selected, all episodes are unwatched.</string>
+
 </strings>
