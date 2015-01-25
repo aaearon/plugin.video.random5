@@ -222,7 +222,6 @@ def create_menu(show_list):
         li.setArt({'banner': show_artwork['banner'], 'fanart': show_artwork['fanart']})
         xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=False)
     
-    print 
     xbmcplugin.endOfDirectory(addon_handle)
 
 # The 'navigation' part
