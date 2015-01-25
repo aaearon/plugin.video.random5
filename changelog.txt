@@ -1,0 +1,3 @@
+v0.3.0
+- Artwork for the different views
+- No more hardcoded strings
