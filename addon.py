@@ -62,6 +62,10 @@ def get_shows():
     log('Returning %s shows' % len(shows), level=xbmc.LOGDEBUG)
     return shows
 
+def get_show_details(show, properties):
+    request = execute_json('VideoLibrary.GetTVShowDetails', {"tvshowid": show, "properties": properties})
+    return request['result']['tvshowdetails']
+    
 
 def get_episodes_by_show(show):
     """Gets all episodes for given show"""
@@ -109,8 +113,8 @@ def get_sequential_episodes(number, show):
     show_episodes = get_episodes_by_show(show)
 
     if len(show_episodes) == 0:
-        line1 = __addon__.getLocalizedString(30100)
-        line2 = __addon__.getLocalizedString(30101)
+        line1 = 'There are no episodes to create a playlist from!'
+        line2 = '\nEither the TV show has no episodes or if watched only is selected, all episodes are unwatched.'
         xbmcgui.Dialog().ok(__addonname__, line1, line2)
 
     if len(show_episodes) < number:  # Just start with the first episode
@@ -142,8 +146,8 @@ def get_random_episodes(number, show):
 
     # Check to make sure we still have an episode pool to pull from
     if len(show_episodes) < 1:
-        line1 = __addon__.getLocalizedString(30100)
-        line2 = __addon__.getLocalizedString(30101)
+        line1 = 'There are no episodes to create a playlist from!'
+        line2 = '\nEither the TV show has no episodes or if watched only is selected, all episodes are unwatched.'
         xbmcgui.Dialog().ok(__addonname__, line1, line2)
 
     if number <= len(show_episodes):
@@ -212,9 +216,13 @@ def create_menu(show_list):
 
     for s in show_list:
         url = sys.argv[0] + "?path=/play&show=%s" % (s['tvshowid'])
-        li = xbmcgui.ListItem(s['label'], iconImage='DefaultFolder.png')
+        show_artwork = get_show_details(s['tvshowid'], ['art'])['art']
+        
+        li = xbmcgui.ListItem(s['label'], iconImage=show_artwork['poster'], thumbnailImage=show_artwork['poster'])
+        li.setArt({'banner': show_artwork['banner'], 'fanart': show_artwork['fanart']})
         xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=False)
-
+    
+    print 
     xbmcplugin.endOfDirectory(addon_handle)
 
 # The 'navigation' part
