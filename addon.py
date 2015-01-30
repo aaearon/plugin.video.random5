@@ -113,8 +113,8 @@ def get_sequential_episodes(number, show):
     show_episodes = get_episodes_by_show(show)
 
     if len(show_episodes) == 0:
-        line1 = 'There are no episodes to create a playlist from!'
-        line2 = '\nEither the TV show has no episodes or if watched only is selected, all episodes are unwatched.'
+        line1 = __addon__.getLocalizedString(30100)
+        line2 = __addon__.getLocalizedString(30101)
         xbmcgui.Dialog().ok(__addonname__, line1, line2)
 
     if len(show_episodes) < number:  # Just start with the first episode
@@ -146,8 +146,8 @@ def get_random_episodes(number, show):
 
     # Check to make sure we still have an episode pool to pull from
     if len(show_episodes) < 1:
-        line1 = 'There are no episodes to create a playlist from!'
-        line2 = '\nEither the TV show has no episodes or if watched only is selected, all episodes are unwatched.'
+        line1 = __addon__.getLocalizedString(30100)
+        line2 = __addon__.getLocalizedString(30101)
         xbmcgui.Dialog().ok(__addonname__, line1, line2)
 
     if number <= len(show_episodes):
