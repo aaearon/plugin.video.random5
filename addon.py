@@ -30,7 +30,7 @@ def log(text, level):
     if isinstance(text, str):
         text = text.decode('utf-8')
 
-    message = u'%s: %s' % (__addonname__, text)
+    message = u'{0}: {1}'.format(__addonname__, text)
     xbmc.log(msg=message.encode('utf-8'), level=level)
 
 
@@ -40,11 +40,7 @@ def execute_json(method, *args, **kwargs):
     else:
         args = kwargs
 
-    params = {}
-    params['jsonrpc'] = '2.0'
-    params['id'] = 0
-    params['method'] = method
-    params['params'] = args
+    params = {'jsonrpc': '2.0', 'id': 0, 'method': method, 'params': args}
 
     values = json.dumps(params)
 
@@ -59,7 +55,7 @@ def get_shows():
     request = execute_json('VideoLibrary.GetTVShows')
     shows = request['result']['tvshows']
 
-    log('Returning %s shows' % len(shows), level=xbmc.LOGDEBUG)
+    log('Returning {0} shows'.format(len(shows)), level=xbmc.LOGDEBUG)
     return shows
 
 def get_show_details(show, properties):
@@ -77,14 +73,14 @@ def get_episodes_by_show(show):
     if watched_only == 'true':
         episodes = get_watched_episodes(episodes)
 
-    log('Returning %s episodes to start with' % len(episodes), level=xbmc.LOGDEBUG)
+    log('Returning {0} episodes to start with'.format(len(episodes)), level=xbmc.LOGDEBUG)
     return episodes
 
 
 def add_file_to_playlist(file):
     """Adds a video file to the video playlist"""
     execute_json('Playlist.Add', {"item": {"file": file['file']}, "playlistid": 1})
-    log('Adding %s to playlist' % file['label'], level=xbmc.LOGDEBUG)
+    log('Adding {0} to playlist'.format(file['label']), level=xbmc.LOGDEBUG)
 
 
 def get_watched_episodes(episode_list):
@@ -155,7 +151,7 @@ def get_random_episodes(number, show):
             random_episode = random.choice(show_episodes)
             if random_episode not in episodes:
                 episodes.append(random_episode)
-                log('Randomly chose episode %s with playcount %s' % (
+                log('Randomly chose episode {0} with playcount {1}'.format(
                     random_episode['label'], random_episode['playcount']), level=xbmc.LOGDEBUG)
 
     # If there are not enough episodes to meet the desired number of playlist items, add what episodes there are
@@ -164,8 +160,8 @@ def get_random_episodes(number, show):
             random_episode = random.choice(show_episodes)
             if random_episode not in episodes:
                 episodes.append(random_episode)
-                log('Randomly chose %s with playcount %s' % (random_episode['label'], random_episode['playcount']),
-                    level=xbmc.LOGDEBUG)
+                log('Randomly chose episode {0} with playcount {1}'.format(
+                    random_episode['label'], random_episode['playcount']), level=xbmc.LOGDEBUG)
 
     return episodes
 
