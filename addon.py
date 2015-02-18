@@ -53,10 +53,15 @@ def execute_json(method, *args, **kwargs):
 def get_shows():
     """Returns all shows in the library"""
     request = execute_json('VideoLibrary.GetTVShows')
-    shows = request['result']['tvshows']
 
-    log('Returning {0} shows'.format(len(shows)), level=xbmc.LOGDEBUG)
-    return shows
+    try:
+        shows = request['result']['tvshows']
+        log('Returning %s shows' % len(shows), level=xbmc.LOGDEBUG)
+        return shows
+    except KeyError:
+        xbmcgui.Dialog().ok(__addonname__, __addon__.getLocalizedString(30100))
+        log('No shows found in library! Exiting...', level=xbmc.LOGDEBUG)
+        sys.exit(-1)
 
 def get_show_details(show, properties):
     request = execute_json('VideoLibrary.GetTVShowDetails', {"tvshowid": show, "properties": properties})

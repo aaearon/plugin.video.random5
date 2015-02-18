@@ -7,5 +7,6 @@
     <string id="30004">Show 'Random show'</string>
     <string id="30100">There are no episodes to create a playlist from!</string>
     <string id="30101">\nEither the TV show has no episodes or if watched only is selected, all episodes are unwatched.</string>
+    <string id="30102">No shows found in library! Add some before trying again.</string>
 
 </strings>
