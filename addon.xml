@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.random5" name="random5" version="0.3.0" provider-name="aaearon">
+<addon id="plugin.video.random5" name="random5" version="0.3.2" provider-name="aaearon">
   <requires>
     <import addon="xbmc.python" version="2.1.0"/>
   </requires>
@@ -18,4 +18,10 @@
     <email>aaearon@gmail.com</email>
     <source>https://github.com/aaearon/plugin.video.random5</source>
   </extension>
+    <extension point="xbmc.addon.repository" name="ioSHARP addons">
+    <info compressed="false">http://iosharp.com/kodi/repo/addons.xml</info>
+    <checksum>http://iosharp.com/kodi/repo/addons.xml.md5</checksum>
+    <datadir zip="true">http://iosharp.com/kodi/repo/</datadir>
+</extension>
+
 </addon>
