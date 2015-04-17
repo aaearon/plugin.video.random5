@@ -52,7 +52,7 @@ def execute_json(method, *args, **kwargs):
 
 def get_shows():
     """Returns all shows in the library"""
-    request = execute_json('VideoLibrary.GetTVShows')
+    request = execute_json('VideoLibrary.GetTVShows', { "sort": {"method": "tvshowtitle"} })
 
     try:
         shows = request['result']['tvshows']
