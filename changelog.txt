@@ -1,5 +1,5 @@
-v0.3.3
-- sort shows by title (ascending)
+v0.3.3 ( 03 August 2015 )
+- Sort shows by title (ascending)
 
 v0.3.2
 - Graceful exit when no TV shows found in library
