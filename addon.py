@@ -219,8 +219,9 @@ def create_menu(show_list):
         url = sys.argv[0] + "?path=/play&show=%s" % (s['tvshowid'])
         show_artwork = get_show_details(s['tvshowid'], ['art'])['art']
         
-        li = xbmcgui.ListItem(s['label'], iconImage=show_artwork['poster'], thumbnailImage=show_artwork['poster'])
-        li.setArt({'banner': show_artwork['banner'], 'fanart': show_artwork['fanart']})
+        li = xbmcgui.ListItem(s['label'], iconImage=show_artwork.get('poster'),
+                              thumbnailImage=show_artwork.get('poster'))
+        li.setArt({'banner': show_artwork.get('banner'), 'fanart': show_artwork.get('fanart')})
         xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=False)
     
     xbmcplugin.endOfDirectory(addon_handle)

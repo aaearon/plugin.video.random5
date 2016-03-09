@@ -1,4 +1,7 @@
-v0.3.3 ( 03 August 2015 )
+v0.4.1 ( 09 March 2016)
+- Account for shows not having all types of artwork
+
+v0.4.0 ( 03 August 2015 )
 - Sort shows by title (ascending)
 
 v0.3.2
